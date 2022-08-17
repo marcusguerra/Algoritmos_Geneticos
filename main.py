@@ -25,7 +25,8 @@ for linha in open('flights.txt'):
     voos.setdefault((origem, destino), [])
     voos[(origem, destino)].append((partida, chegada, int(preco)))
 
-# [1,4, 3,2, 7,3, 6,3, 2,4, 5,3]
+
+# [1,5, 3,1, 7,3, 6,3, 2,4, 5,3]
 def imprime_calendario(calendario):
   voo_id = -1
   preco_total = 0
@@ -40,9 +41,48 @@ def imprime_calendario(calendario):
     preco_total += voo_volta[2]
     print('%10s%10s %5s-%5s U$%3s %5s-%5s U$%3s' % (nome, origem, voo_ida[0], voo_ida[1], voo_ida[2],
                                                     voo_volta[0], voo_volta[1], voo_volta[2]))
+
   print('Preço total: ', preco_total)
 
 def get_minutos(hora):
   t = time.strptime(hora, '%H:%M')
   minutos = t[3] * 60 + t[4]
   return minutos
+
+def funcao_avaliacao(calendario):
+  preco_total = 0
+  ultima_chegada = 0
+  primeira_partida = 1439
+
+  voo_id = -1
+  for i in range(len(calendario) // 2):
+    origem = pessoas[i][1]
+    voo_id += 1
+    voo_ida = voos[(origem, destino)][calendario[voo_id]]
+    voo_id += 1
+    voo_volta = voos[(destino, origem)][calendario[voo_id]]
+
+    preco_total += voo_ida[2]
+    preco_total += voo_volta[2]
+
+    if ultima_chegada < get_minutos(voo_ida[1]):
+      ultima_chegada = get_minutos(voo_ida[1])
+    if primeira_partida > get_minutos(voo_volta[0]):
+      primeira_partida = get_minutos(voo_volta[0])
+
+  espera_total = 0
+  voo_id = -1
+  for i in range(len(calendario) // 2):
+    origem = pessoas[i][1]
+    voo_id += 1
+    voo_ida = voos[(origem, destino)][calendario[voo_id]]
+    voo_id += 1
+    voo_volta = voos[(destino, origem)][calendario[voo_id]]
+
+    espera_total += ultima_chegada - get_minutos(voo_ida[1])
+
+    espera_total += get_minutos(voo_volta[0]) - primeira_partida
+
+
+  return espera_total + preco_total
+
