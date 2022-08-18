@@ -49,7 +49,7 @@ def get_minutos(hora):
   minutos = t[3] * 60 + t[4]
   return minutos
 
-def funcao_avaliacao(calendario):
+def avaliacao(calendario):
   preco_total = 0
   ultima_chegada = 0
   primeira_partida = 1439
@@ -99,8 +99,6 @@ def gera_invididuoAleatorio():
     calendario.append(random.randint(0, alcance))
   return calendario
 
-
-
 def mutacao(passo, individuo):
   gene_mutado = random.randint(0, dominio-1)
   passo = passo * random.randrange(1, -2, -2)
@@ -119,3 +117,22 @@ def crossover(individuo1, individuo2):
   gene_max = random.randint(0, alcance)
   return individuo1[0:gene_max] + individuo2[gene_max:]
 
+#tamanho da populacao = quantos individuos terao na amostra inicial
+#elitismo = depois da avialiacao inicial, voce pegara os melhores 20% inicais
+#numero de gerações = quantas vezes os processos de crossover, mutações, etc serao rodados(qnt mais complexo mais geracoes é bom ter)
+
+
+def algoritmo_genetico(tamanho_populacao, passo, elitismo, numero_geracoes):
+  elitismo = int(math.ceil(elitismo * tamanho_populacao))
+  total_individuos = []
+  for i in range(tamanho_populacao):
+    total_individuos.append(gera_invididuoAleatorio())
+
+  for i in range(numero_geracoes):
+    valor_individuos = [(avaliacao(total_individuos), total_individuos) for total_individuos in total_individuos]
+    valor_individuos.sort()
+    total_individuos = [total_individuos for (custo , total_individuos) in valor_individuos]
+    populacao = total_individuos[0:elitismo]
+
+
+algoritmo_genetico(10, 1, 0.2, 1)
