@@ -99,17 +99,20 @@ def gera_invididuoAleatorio():
     calendario.append(random.randint(0, alcance))
   return calendario
 
-def mutacao(passo, individuo):
-  gene_mutado = random.randint(0, dominio-1)
-  passo = passo * random.randrange(1, -2, -2)
-  if(individuo[gene_mutado]+passo <= alcance and individuo[gene_mutado]+passo >= 0):
-    individuo[gene_mutado] += passo
-    return individuo
-  elif(individuo[gene_mutado]+passo > alcance):
-    individuo[gene_mutado] = alcance
-    return individuo
+def mutacao(passo, individuo, chance):
+  if(random.random() <= chance):
+    gene_mutado = random.randint(0, dominio-1)
+    passo = passo * random.randrange(1, -2, -2)
+    if(individuo[gene_mutado]+passo <= alcance and individuo[gene_mutado]+passo >= 0):
+      individuo[gene_mutado] += passo
+      return individuo
+    elif(individuo[gene_mutado]+passo > alcance):
+      individuo[gene_mutado] = alcance
+      return individuo
+    else:
+      individuo[gene_mutado] = 0
+      return individuo
   else:
-    individuo[gene_mutado] = 0
     return individuo
 
 
@@ -122,17 +125,27 @@ def crossover(individuo1, individuo2):
 #numero de gerações = quantas vezes os processos de crossover, mutações, etc serao rodados(qnt mais complexo mais geracoes é bom ter)
 
 
-def algoritmo_genetico(tamanho_populacao, passo, elitismo, numero_geracoes):
+def algoritmo_genetico(tamanho_populacao, passo, elitismo, numero_geracoes, chance_mutacao):
   elitismo = int(math.ceil(elitismo * tamanho_populacao))
   total_individuos = []
   for i in range(tamanho_populacao):
     total_individuos.append(gera_invididuoAleatorio())
 
+
   for i in range(numero_geracoes):
     valor_individuos = [(avaliacao(total_individuos), total_individuos) for total_individuos in total_individuos]
     valor_individuos.sort()
-    total_individuos = [total_individuos for (custo , total_individuos) in valor_individuos]
-    populacao = total_individuos[0:elitismo]
+    total_individuosOrdenados = [total_individuos for (custo , total_individuos) in valor_individuos]
+    total_individuos = total_individuosOrdenados[0:elitismo]
+    while len(total_individuos) < tamanho_populacao:
+      i1 = random.randint(0, elitismo)
+      i2 = random.randint(0, elitismo)
+      novo_individuo = crossover(total_individuosOrdenados[i1], total_individuosOrdenados[i2])
+      novo_individuoMutado = mutacao(passo, novo_individuo, chance_mutacao)
+      total_individuos.append(novo_individuoMutado)
 
+  return total_individuosOrdenados[0]
 
-algoritmo_genetico(10, 1, 0.2, 1)
+vet = algoritmo_genetico(10000, 2, 0.2, 10, 0.005)
+print(avaliacao(vet))
+print(imprime_calendario(vet))
