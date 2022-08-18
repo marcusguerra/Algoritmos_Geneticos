@@ -86,3 +86,36 @@ def funcao_avaliacao(calendario):
 
   return espera_total + preco_total
 
+
+#12 pois são 6 pessoas no problema original e como é um voo de ida e outro de volta 12
+#9 pois são 9 possibilidades de voo no total
+
+alcance = 9
+dominio = 12
+
+def gera_invididuoAleatorio():
+  calendario = []
+  for i in range(dominio):
+    calendario.append(random.randint(0, alcance))
+  return calendario
+
+
+
+def mutacao(passo, individuo):
+  gene_mutado = random.randint(0, dominio-1)
+  passo = passo * random.randrange(1, -2, -2)
+  if(individuo[gene_mutado]+passo <= alcance and individuo[gene_mutado]+passo >= 0):
+    individuo[gene_mutado] += passo
+    return individuo
+  elif(individuo[gene_mutado]+passo > alcance):
+    individuo[gene_mutado] = alcance
+    return individuo
+  else:
+    individuo[gene_mutado] = 0
+    return individuo
+
+
+def crossover(individuo1, individuo2):
+  gene_max = random.randint(0, alcance)
+  return individuo1[0:gene_max] + individuo2[gene_max:]
+
